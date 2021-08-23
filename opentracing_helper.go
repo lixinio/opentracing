@@ -41,11 +41,18 @@ func (p opentracingPlugin) injectBefore(db *gorm.DB, op operationName) {
 	}
 
 	if db.Statement == nil || db.Statement.Context == nil {
-		db.Logger.Error(context.TODO(), "could not inject sp from nil Statement.Context or nil Statement")
+		db.Logger.Error(
+			context.TODO(),
+			"could not inject sp from nil Statement.Context or nil Statement",
+		)
 		return
 	}
 
-	sp, _ := opentracing.StartSpanFromContextWithTracer(db.Statement.Context, p.opt.tracer, op.String())
+	sp, _ := opentracing.StartSpanFromContextWithTracer(
+		db.Statement.Context,
+		p.opt.tracer,
+		op.String(),
+	)
 	db.InstanceSet(opentracingSpanKey, sp)
 }
 
@@ -55,7 +62,10 @@ func (p opentracingPlugin) extractAfter(db *gorm.DB) {
 		return
 	}
 	if db.Statement == nil || db.Statement.Context == nil {
-		db.Logger.Error(context.TODO(), "could not extract sp from nil Statement.Context or nil Statement")
+		db.Logger.Error(
+			context.TODO(),
+			"could not extract sp from nil Statement.Context or nil Statement",
+		)
 		return
 	}
 
@@ -116,7 +126,10 @@ func log(sp opentracing.Span, db *gorm.DB, verbose bool, logSqlVariables bool) {
 		// FIXED(@yeqown) db.Statement.Dest still be metatable now ?
 		v, err := json.Marshal(db.Statement.Dest)
 		if err == nil {
-			fields = append(fields, opentracinglog.String(_resultLogKey, *(*string)(unsafe.Pointer(&v))))
+			fields = append(
+				fields,
+				opentracinglog.String(_resultLogKey, *(*string)(unsafe.Pointer(&v))),
+			)
 		} else {
 			db.Logger.Error(context.Background(), "could not marshal db.Statement.Dest: %v", err)
 		}
@@ -125,7 +138,11 @@ func log(sp opentracing.Span, db *gorm.DB, verbose bool, logSqlVariables bool) {
 	sp.LogFields(fields...)
 }
 
-func appendSql(fields []opentracinglog.Field, db *gorm.DB, logSqlVariables bool) []opentracinglog.Field {
+func appendSql(
+	fields []opentracinglog.Field,
+	db *gorm.DB,
+	logSqlVariables bool,
+) []opentracinglog.Field {
 	if logSqlVariables {
 		fields = append(fields, opentracinglog.String(_sqlLogKey,
 			db.Dialector.Explain(db.Statement.SQL.String(), db.Statement.Vars...)))

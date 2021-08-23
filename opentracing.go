@@ -36,25 +36,37 @@ func (p opentracingPlugin) Initialize(db *gorm.DB) (err error) {
 	}
 
 	// create
-	err = db.Callback().Create().Before("gorm:create").Register(_stageBeforeCreate.Name(), p.beforeCreate)
+	err = db.Callback().
+		Create().
+		Before("gorm:create").
+		Register(_stageBeforeCreate.Name(), p.beforeCreate)
 	e.add(_stageBeforeCreate, err)
 	err = db.Callback().Create().After("gorm:create").Register(_stageAfterCreate.Name(), p.after)
 	e.add(_stageAfterCreate, err)
 
 	// update
-	err = db.Callback().Update().Before("gorm:update").Register(_stageBeforeUpdate.Name(), p.beforeUpdate)
+	err = db.Callback().
+		Update().
+		Before("gorm:update").
+		Register(_stageBeforeUpdate.Name(), p.beforeUpdate)
 	e.add(_stageBeforeUpdate, err)
 	err = db.Callback().Update().After("gorm:update").Register(_stageAfterUpdate.Name(), p.after)
 	e.add(_stageAfterUpdate, err)
 
 	// query
-	err = db.Callback().Query().Before("gorm:query").Register(_stageBeforeQuery.Name(), p.beforeQuery)
+	err = db.Callback().
+		Query().
+		Before("gorm:query").
+		Register(_stageBeforeQuery.Name(), p.beforeQuery)
 	e.add(_stageBeforeQuery, err)
 	err = db.Callback().Query().After("gorm:query").Register(_stageAfterQuery.Name(), p.after)
 	e.add(_stageAfterQuery, err)
 
 	// delete
-	err = db.Callback().Delete().Before("gorm:delete").Register(_stageBeforeDelete.Name(), p.beforeDelete)
+	err = db.Callback().
+		Delete().
+		Before("gorm:delete").
+		Register(_stageBeforeDelete.Name(), p.beforeDelete)
 	e.add(_stageBeforeDelete, err)
 	err = db.Callback().Delete().After("gorm:delete").Register(_stageAfterDelete.Name(), p.after)
 	e.add(_stageAfterDelete, err)
